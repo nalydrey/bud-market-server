@@ -11,6 +11,9 @@ const PORT = process.env.APP_PORT || 5000
 // create and setup express app
 const app = express()
 const router = new Routes(app)
+app.use(express.static('uploads'))
+
+
 app.use(express.json())
 app.use(cors())
 router.init()

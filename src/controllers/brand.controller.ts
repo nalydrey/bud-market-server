@@ -28,12 +28,14 @@ export class BrandController {
     }
 
     async delete(req: Request, res: Response){
+        console.log(req.params);
+        
         try{
             const id = +req.params.id
             const brand = await this.brandService.getOne(id)
             if(!brand) throw new Error('note was not found')
-            await this.fileService.delete(brand.logoImg)
             await this.brandService.delete(id)
+            await this.fileService.delete(brand.logoImg)
             res.status(200).json({
                 success: true
             })
@@ -47,11 +49,15 @@ export class BrandController {
     }
 
     async edit(req: Request, res: Response){
-
-        const {name, fileName} = req.body
+        const {name} = req.body
+        const files = req.files as Express.Multer.File[]
+        const fileName = files.length > 0 ? files[0].filename : undefined
+        
         const id = +req.params.id
         try{
+            const oldBrand = await this.brandService.getOne(id)
             const brand = await this.brandService.edit({id, name, fileName})
+            fileName && oldBrand && await this.fileService.delete(oldBrand.logoImg)
             res.status(200).json({
                 brand
             })

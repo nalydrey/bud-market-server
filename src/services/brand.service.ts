@@ -22,6 +22,8 @@ export class BrandService {
     }
 
     async edit(editBrandDto: EditBrandDto){
+        console.log(editBrandDto);
+        
         const {id, fileName, name} = editBrandDto
         const brand = await repo.findOneBy({id})
         if(brand){
