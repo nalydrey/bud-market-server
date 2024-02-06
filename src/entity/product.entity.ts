@@ -40,7 +40,7 @@ export class Product {
     category: Relation<Category>
 
     @ManyToOne(() => Label, (label) => label.products )
-    label: Label
+    label: Relation<Label>
 
     @ManyToOne(() => Brand, (brand) => brand.products)
     brand: Relation<Brand>
