@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { validateOrReject } from "class-validator";
 import { plainToClass } from "class-transformer";
-import { CreateProductDto } from "../dto/create-product.dto.js";
+import { CreateProductDto } from "../dto/product/create-product.dto.js";
 
 export function validateAndTransform(
   ValidateClass: new () => object,

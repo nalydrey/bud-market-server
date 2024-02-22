@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import multer from 'multer'
 import path from 'path';
-import { brandController } from '../../controllers/brand.controller.js';
+import { brandController } from '../controllers/brand.controller.js';
 
 
 
@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
       cb(null, `${process.cwd()}/uploads`)
     },
     filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now()+ '.' + path.extname(file.originalname))
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
     }
   })
   

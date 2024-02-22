@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { labelController } from "../../controllers/label.controller.js";
+import { labelController } from "../controllers/label.controller.js";
 
 export const labelRouter = Router()
 

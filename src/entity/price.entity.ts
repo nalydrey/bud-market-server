@@ -7,9 +7,9 @@ export class Price {
     id: number
 
     @Column()
-    value: string
+    value: number
 
-    @ManyToOne(() => Product, (product) => product.priceHistory)
+    @ManyToOne(() => Product, (product) => product.priceHistory, {onDelete: 'CASCADE'})
     product: Relation<Product>
 
     @CreateDateColumn()

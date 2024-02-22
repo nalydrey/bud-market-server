@@ -1,67 +1,53 @@
-import {Request, Response } from 'express'
-import { ProductService, productService } from '../services/product.service.js'
-import { CharacteristicService, characteristicService } from '../services/characteristic.service.js';
+import { Request, Response } from "express";
+import { ProductService, productService } from "../services/product.service.js";
+import { CreatePhotoDto } from "../dto/photo/create-photo.dto.js";
 
-class ProductController {
 
-    constructor(private productService: ProductService, private characteristicService: CharacteristicService) {
+export class ProductController {
+    constructor (
+        private productService: ProductService        
+    ) {}
+
+    async create (req: Request, res: Response) {
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         
+      console.log(req.files);
+      console.log(req.body);
+      
+        
+        const product = await this.productService.create(req.body)
+        res.status(201).json({
+            product
+        })
     }
+    
+    async delete (req: Request, res: Response) {
+        await this.productService.delete(+req.params.id)
+        res.status(200).json({
+            success: true,
+            message: 'Product was deleted'
+        })
+    }
+    
+    async update (req: Request, res: Response) {
 
-    async getProducts(req: Request, res: Response){
-        const queryObj = req.query
-        console.log(queryObj);
+    }
+   
+    async getOne (req: Request, res: Response) {
+
+    }
+   
+    async getMany (req: Request, res: Response) {
+        console.log(req.query);
         
-        
-        const products = await productService.getProducts(queryObj)
+        const products = await this.productService.getMany(req.query)
+
         res.status(200).json({
             products
         })
     }
 
-    async createProduct(req: Request, res: Response){
-        const createProductDto = req.body 
-        
-        const product = await this.productService.createProduct(createProductDto)
-        res.status(201).json({
-            product
-        })
-    }
-  
-    async deleteProduct(req: Request, res: Response){
-        const productId = +req.params.id
-        const product = await this.productService.deleteProduct(productId)
-        res.status(201).json({
-            product
-        })
-    }
-
-    async getAllGroup(req: Request, res: Response){
-        const groups = await productService.getAllGroup()
-        res.status(200).json({
-            groups
-        })
-    }
-
-    async groupBy (req: Request, res: Response) {
-        const {groupName} = req.params
-        const groups = await this.productService.getTypeListByCategory(groupName)
-        res.status(200).json({
-            groups
-        })
-    }
-
-    async getChatacteristics (req: Request, res: Response) {
-        const type = req.params.type
-        
-        const groups  = await this.characteristicService.getCharacteristicsByType(type)
-        res.status(200).json({
-            groups
-        })
-    }
-
-
-
+    
 }
 
-export const  productController = new ProductController(productService, characteristicService)
+export const productController = new ProductController(productService)

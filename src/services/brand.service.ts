@@ -1,6 +1,7 @@
 import { myDataSource } from "../data-source/data-source.init.js";
-import { CreateBrandDto } from "../dto/create-brand.dto.js";
-import { EditBrandDto } from "../dto/edit-brand.dto.js";
+import { CreateBrandDto } from "../dto/brand/create-brand.dto.js";
+import { EditBrandDto } from "../dto/brand/edit-brand.dto.js";
+import { QueryBrandDto } from "../dto/brand/query-brand.dto.js";
 import { Brand } from "../entity/brand.entity.js";
 
 
@@ -22,7 +23,6 @@ export class BrandService {
     }
 
     async edit(editBrandDto: EditBrandDto){
-        console.log(editBrandDto);
         
         const {id, fileName, name} = editBrandDto
         const brand = await repo.findOneBy({id})
@@ -34,8 +34,14 @@ export class BrandService {
         return brand
     }
 
-    getMany(){
-        return repo.find()
+    getMany(query: QueryBrandDto){
+        console.log(query);
+        
+        return repo.find({
+            where: {
+                ...query.filter
+            }
+        })
     }
 
     getOne(id: number){

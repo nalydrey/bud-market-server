@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, UpdateDateColumn } from "typeorm";
 import { Product } from "./product.entity.js";
+import { Category } from "./category.entity.js";
 
 @Entity()
 export class Photo {
@@ -12,8 +13,11 @@ export class Photo {
     @Column()
     fileName: string
 
-    @ManyToOne(() => Product, (product) => product.images)
+    @ManyToOne(() => Product, (product) => product.images, {onDelete: 'CASCADE'})
     products: Relation<Product[]>
+
+    @OneToOne(()=>Category, (category) => category.photo, {onDelete: 'CASCADE'})
+    category: Relation<Category>
 
     @CreateDateColumn()
     createdDate: Date

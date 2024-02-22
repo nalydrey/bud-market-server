@@ -10,26 +10,28 @@ export class BrandController {
     ){}
 
     async create(req: Request, res: Response){
-
-        const files = req.files as Express.Multer.File[]
-        const fileName = files[0].filename
+        let fileName = null
+        let brand = null
         try{
-            const brand = await this.brandService.create({name: req.body.name, fileName })
+            const files = req.files as Express.Multer.File[]
+            const isExistFile: boolean = !!files.length
+            if(isExistFile) fileName = files[0].filename
+            if(fileName){
+                brand = await this.brandService.create({name: req.body.name, fileName})
+            }
             res.status(201).json({
                 brand
             })
         }
         catch(err){
-            this.fileService.delete(fileName)
+            fileName && this.fileService.delete(fileName)
             res.status(500).json({
-                message: 'Brand was not created'
+                message: 'Бренд не був створений'
             })
         }
     }
 
     async delete(req: Request, res: Response){
-        console.log(req.params);
-        
         try{
             const id = +req.params.id
             const brand = await this.brandService.getOne(id)
@@ -43,7 +45,7 @@ export class BrandController {
         catch(err){
             res.status(500).json({
                 success: false,
-                message: 'Brand was not deleted'
+                message: 'Бренд не був видалений'
             })
         }
     }
@@ -86,7 +88,7 @@ export class BrandController {
 
     async getMany(req: Request, res: Response){
         try{
-            const brands = await this.brandService.getMany()
+            const brands = await this.brandService.getMany(req.query)
             res.status(200).json({
                 brands
             })

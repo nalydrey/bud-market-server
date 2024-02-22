@@ -1,52 +1,42 @@
 import { myDataSource } from "../data-source/data-source.init.js";
-import { CreateCharacteristicDto } from "../dto/create-characteristic.dto.js";
-import { IFilter } from "../dto/query.dto.js";
+import { CreateCharacteristicsDto } from "../dto/characteristic/create-characteristics.dto.js";
+import { EditCharacteristicsDto } from "../dto/characteristic/edit-characteristic.dto.js";
 import { Characteristic } from "../entity/characteristics.entity.js";
 
+const repo = myDataSource.getRepository(Characteristic)
 
 export class CharacteristicService {
-
-    readonly repo = myDataSource.getRepository(Characteristic)
-
-    async findByFilter (filter: IFilter[]) {
-        return this.repo.find({
-            where: filter,
-            relations: {
-                product: true
-            }
-        })
+    create (createDto: CreateCharacteristicsDto) {
+        const { name, unit, value } = createDto
+        const characteristic = new Characteristic()
+        characteristic.name = name
+        characteristic.unit = unit
+        characteristic.value = value
+        return repo.save(characteristic)
     }
 
-    createNewCharacreristics (characteristicDto: CreateCharacteristicDto[]) {
-        const characteristicArr = characteristicDto.map(characteristic => {
-            const newCharacteristic = new Characteristic()
-            Object.assign(newCharacteristic, characteristic) 
-            return newCharacteristic
-        })
-        return this.repo.save(characteristicArr)
+    delete (id: number) {
+        return repo.delete(id)
     }
-
-    deleteCharacteristic () {
-
+    
+    async update (editDto: EditCharacteristicsDto) {
+        const { id, name, unit, value } = editDto
+        const characteristic = await repo.findOneBy({id})
+        if(characteristic){
+            if(name) characteristic.name = name
+            if(unit) characteristic.unit = unit
+            if(value) characteristic.value = value
+            return repo.save(characteristic)
+        }
+        return null
     }
-
-    editCharacteristic () {
-
+    
+    getOne (id: number) {
+        return repo.findOneBy({id})
     }
-
-    async getCharacteristicsByType (type: string) {
-        
-        return this.repo
-            .createQueryBuilder('characteristic')
-            .leftJoinAndSelect('characteristic.product', 'product')
-            .select('characteristic.value', 'value')
-            .addSelect('characteristic.name', 'name')
-            .addSelect('characteristic.unit', 'unit')
-            .where('product.type = :type', {type} )
-            .groupBy('characteristic.name')
-            .addGroupBy('characteristic.value')
-            .addGroupBy('characteristic.unit')
-            .getRawMany()
+    
+    getMany () {
+        return repo.find()
     }
 }
 

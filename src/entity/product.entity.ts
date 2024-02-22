@@ -36,19 +36,19 @@ export class Product {
     })
     viewCounter: number
 
-    @ManyToOne(() => Category, (category) => category.products) 
+    @ManyToOne(() => Category, (category) => category.products, {eager: true}) 
     category: Relation<Category>
 
-    @ManyToOne(() => Label, (label) => label.products )
+    @ManyToOne(() => Label, (label) => label.products, {eager: true, onDelete: 'SET NULL'} )
     label: Relation<Label>
 
-    @ManyToOne(() => Brand, (brand) => brand.products)
+    @ManyToOne(() => Brand, (brand) => brand.products, {eager: true})
     brand: Relation<Brand>
 
-    @OneToMany(() => Price, (price) => price.product )
+    @OneToMany(() => Price, (price) => price.product, {eager: true} )
     priceHistory: Relation<Price[]>
 
-    @OneToMany(() => Photo, (photo) => photo.products )
+    @OneToMany(() => Photo, (photo) => photo.products, {eager: true} )
     images: Relation<Photo[]> 
 
     @OneToMany(()=>Characteristic, (characteristic)=> characteristic.product, {eager: true} )
