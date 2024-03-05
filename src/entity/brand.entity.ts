@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { AfterLoad, Column, Entity, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 import { Product } from "./product.entity.js";
 
 @Entity()
@@ -11,9 +11,18 @@ export class Brand {
     })
     name: string
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     logoImg: string
 
     @OneToMany(() => Product, (product) => product.brand)
     products: Relation<Product[]>
+
+    @AfterLoad()
+    addHostPrefix(){
+        if(this.logoImg){
+            this.logoImg =`${process.env.SERVER_PROTOCOL}://${process.env.SERVER_ADRESS}:${process.env.APP_PORT}/${this.logoImg}`
+        }
+    }
 }

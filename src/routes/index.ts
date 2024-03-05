@@ -4,6 +4,10 @@ import { brandRouter } from "./brand.route.js"
 import { labelRouter } from "./label.route.js"
 import { categoryRouter } from "./category.route.js"
 import { photoRouter } from "./photo.route.js"
+import { characteristicRouter } from "./characteristic.route.js"
+import { orderRouter } from "./order.route.js"
+import { userRouter } from "./user.route.js"
+import { reviewRouter } from "./review.route.js"
 
 
 export class Routes {
@@ -18,5 +22,9 @@ export class Routes {
       this.app.use(`${this.baseURL}/labels`, labelRouter)
       this.app.use(`${this.baseURL}/categories`, categoryRouter)
       this.app.use(`${this.baseURL}/photos`, photoRouter)
+      this.app.use(`${this.baseURL}/characteristics`, characteristicRouter)
+      this.app.use(`${this.baseURL}/order`, orderRouter)
+      this.app.use(`${this.baseURL}/users`, userRouter)
+      this.app.use(`${this.baseURL}/reviews`, reviewRouter)
    }
 }

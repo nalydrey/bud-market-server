@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, UpdateDateColumn } from "typeorm";
+import { AfterLoad, Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, Relation, UpdateDateColumn } from "typeorm";
 import { Product } from "./product.entity.js";
 import { Category } from "./category.entity.js";
 
@@ -24,4 +24,9 @@ export class Photo {
 
     @UpdateDateColumn()
     updatedDate: Date
+
+    @AfterLoad()
+    addHostPrefix(){
+        this.fileName =`${process.env.SERVER_PROTOCOL}://${process.env.SERVER_ADRESS}:${process.env.APP_PORT}/${this.fileName}`
+    }
 }

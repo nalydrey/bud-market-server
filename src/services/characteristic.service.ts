@@ -38,6 +38,26 @@ export class CharacteristicService {
     getMany () {
         return repo.find()
     }
+
+    async getGroup (categorySystemName: string) {
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        const a =await repo
+            .createQueryBuilder('characteristic')
+            .select('characteristic.name', 'name')
+            .addSelect('characteristic.value', 'value')
+            .addSelect('characteristic.unit', 'unit')
+            .leftJoin('characteristic.product', 'product')
+            .leftJoin('product.category', 'category')
+            .where('category.systemName = :categorySystemName', {categorySystemName})
+            .groupBy('characteristic.name')
+            .addGroupBy('characteristic.value')
+            .addGroupBy('characteristic.unit')
+            .getRawMany()
+            
+            
+            console.log(a);
+            return a
+    }
 }
 
 export const characteristicService = new CharacteristicService()

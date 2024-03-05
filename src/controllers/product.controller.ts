@@ -34,7 +34,11 @@ export class ProductController {
     }
    
     async getOne (req: Request, res: Response) {
-
+        const id = +req.params.id
+        const product = await this.productService.getOne(id)
+        res.status(200).json({
+            product
+        })
     }
    
     async getMany (req: Request, res: Response) {

@@ -7,6 +7,10 @@ import { Price } from "../entity/price.entity.js"
 import { Photo } from "../entity/photo.entity.js"
 import { Label } from "../entity/label.entity.js"
 import { Category } from "../entity/category.entity.js"
+import { OrderItem } from "../entity/order-item.entity.js"
+import { Order } from "../entity/order.entity.js"
+import { User } from "../entity/user.entity.js"
+import { Review } from "../entity/review.entity.js"
 config()
 const PORT = process.env.DB_PORT && +process.env.DB_PORT || 3306
 
@@ -18,7 +22,7 @@ export const myDataSource = new DataSource({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_BASENAME,
-    entities: [Characteristic, Product, Brand, Price, Photo, Label, Category],
+    entities: [Characteristic, Product, Brand, Price, Photo, Label, Category, OrderItem, Order, User, Review],
     logging: true,
     synchronize: true,
 })

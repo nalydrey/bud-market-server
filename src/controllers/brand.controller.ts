@@ -10,15 +10,9 @@ export class BrandController {
     ){}
 
     async create(req: Request, res: Response){
-        let fileName = null
-        let brand = null
+        const fileName = req.file ? req.file.filename : null
         try{
-            const files = req.files as Express.Multer.File[]
-            const isExistFile: boolean = !!files.length
-            if(isExistFile) fileName = files[0].filename
-            if(fileName){
-                brand = await this.brandService.create({name: req.body.name, fileName})
-            }
+            const brand = await this.brandService.create({name: req.body.name, fileName})
             res.status(201).json({
                 brand
             })
@@ -26,7 +20,7 @@ export class BrandController {
         catch(err){
             fileName && this.fileService.delete(fileName)
             res.status(500).json({
-                message: 'Бренд не був створений'
+                message: 'Бренд не було створений'
             })
         }
     }

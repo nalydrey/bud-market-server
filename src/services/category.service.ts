@@ -1,4 +1,4 @@
-import { ArrayContains, IsNull, Not } from "typeorm";
+import { ArrayContains, In, IsNull, Not } from "typeorm";
 import { myDataSource } from "../data-source/data-source.init.js";
 import { CreateCategoryDto } from "../dto/create-category.dto.js";
 import { EditCategoryDto } from "../dto/edit-category.dto.js";
@@ -65,9 +65,13 @@ export class CategoryService {
     }
 
     getMany(query: CategoryQueryDto) {
+        console.log('GET MANY CATEGORIES');
+        
+        console.log(query);
+        
        return repo.find({
             where: {
-                products: {id: Not(IsNull())},
+                products: query.filter && query.filter.productIds ? {id: In(query.filter.productIds)} : {id: Not(IsNull())},
                 // systemName: query.filter?.systemName,
             },
         })

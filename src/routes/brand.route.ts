@@ -3,6 +3,10 @@ import { Router } from 'express'
 import multer from 'multer'
 import path from 'path';
 import { brandController } from '../controllers/brand.controller.js';
+import { CreateBrandDto } from '../dto/brand/create-brand.dto.js';
+import { validateAndTransform } from '../middlewares/validator.js';
+import { alreadyExist } from '../middlewares/alreadyExist.js';
+import { Brand } from '../entity/brand.entity.js';
 
 
 
@@ -20,9 +24,9 @@ const storage = multer.diskStorage({
 
 export const brandRouter = Router()
 
-brandRouter.post('/', upload.any(), brandController.create.bind(brandController))
+brandRouter.post('/', upload.single('file'), validateAndTransform(CreateBrandDto), alreadyExist(Brand, 'name'), brandController.create.bind(brandController))
 
-brandRouter.put('/:id', upload.any(), brandController.edit.bind(brandController))
+brandRouter.put('/:id', upload.single('file'), brandController.edit.bind(brandController))
 
 brandRouter.delete('/:id', brandController.delete.bind(brandController))
 

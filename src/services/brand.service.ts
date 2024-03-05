@@ -4,16 +4,18 @@ import { EditBrandDto } from "../dto/brand/edit-brand.dto.js";
 import { QueryBrandDto } from "../dto/brand/query-brand.dto.js";
 import { Brand } from "../entity/brand.entity.js";
 
+type CreateBrandData = CreateBrandDto & {fileName: string | null}
 
 const repo = myDataSource.getRepository(Brand)
 
 export class BrandService {
 
-    create(brandDto: CreateBrandDto){
+    create(createData: CreateBrandData){
+        const {fileName, name} = createData
         const newBrand = new Brand()
 
-        newBrand.logoImg = brandDto.fileName
-        newBrand.name = brandDto.name
+        if(fileName) newBrand.logoImg = fileName
+        newBrand.name = name
 
         return repo.save(newBrand)
     }
