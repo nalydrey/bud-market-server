@@ -1,33 +1,53 @@
 import { Request, Response } from "express";
 import { CategoryService, categoryService } from "../services/category.service.js";
 import { PhotoService, photoService } from "../services/photo.service.js";
+import { ExtRequest } from "../models/ext-request.model.js";
+import { CreateCategoryDto } from "../dto/category/create-category.dto.js";
+import { Category } from "../entity/category.entity.js";
 
 
 export class CategoryController {
     constructor(private categoryService: CategoryService, private photoService: PhotoService){}
 
-    async create (req: Request, res: Response) {
-        let category = null
-        if(req.file){
-            const {filename, originalname} = req.file
-            const photo = await this.photoService.create({fileName: filename, name: originalname})
-            category = await this.categoryService.create(req.body, photo)
+    async create (req: ExtRequest, res: Response) {
+        const createDto = req.body as CreateCategoryDto
+        try{
+            let photo = null
+            if(req.file){
+                const {filename, originalname} = req.file
+                photo = await this.photoService.create({fileName: filename, name: originalname})
+            }
+            const category = await this.categoryService.create({...createDto, photo})
+            res.status(201).json({
+                category
+            })
         }
-        res.status(201).json({
-            category
-        })
+        catch(err){
+            res.status(500).json({
+                message: 'Помилка при створенні категорії'
+            })
+        }
     }
     
-    async delete (req: Request, res: Response) {
-        await this.categoryService.delete(+req.params.id)
-        res.status(200).json({
-            success: true
-        })
+    async delete (req: ExtRequest, res: Response) {
+        try{
+            const category = req.entity
+            if(!category) throw new Error('No category')
+            if(category instanceof Category){
+                await this.categoryService.delete(category)
+            }
+            res.status(200).json({
+                category
+            })
+        }
+        catch{
+            res.status(500).json({
+                message: 'Помилка при видаленні категорії'
+            })
+        }
     }
     
     async update (req: Request, res: Response) {
-        console.log(req.body);
-        
         const id = +req.params.id
         const {parentId, name} = req.body
         const category = await this.categoryService.update({id, name, parentId})
@@ -41,7 +61,6 @@ export class CategoryController {
     }
     
     async getTree (req: Request, res: Response) {
-        console.log('!');
         const categories = await this.categoryService.getTree()
         res.status(200).json({
             categories
@@ -56,9 +75,6 @@ export class CategoryController {
     }
 
     async getDescendantsTree (req: Request, res: Response) {
-        console.log('!!');
-        console.log(req.params.name);
-        
         const name = req.params.name
         const category = await this.categoryService.getDescendantsTree(name)
         res.status(200).json({

@@ -3,6 +3,7 @@ import { Product } from "./product.entity.js";
 
 @Entity()
 export class Brand {
+
     @PrimaryGeneratedColumn()
     id: number
 
@@ -12,9 +13,10 @@ export class Brand {
     name: string
 
     @Column({
-        nullable: true
+        nullable: true,
+        default: null
     })
-    logoImg: string
+    logoImg?: string
 
     @OneToMany(() => Product, (product) => product.brand)
     products: Relation<Product[]>

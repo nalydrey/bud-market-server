@@ -1,57 +1,38 @@
-import {  Between, ILike, In } from "typeorm";
+import {  Any, Between, ILike, In } from "typeorm";
 import { myDataSource } from "../data-source/data-source.init.js";
-import { CreateProductDto } from "../dto/product/create-product.dto.js";
 import { ProductQueryDto } from "../dto/product/product-query.dto.js";
 import { Product } from "../entity/product.entity.js";
-import { BrandService, brandService } from "./brand.service.js";
-import { CategoryService, categoryService } from "./category.service.js";
-import { CharacteristicService, characteristicService } from "./characteristic.service.js";
-import { LabelService, labelService } from "./label.service.js";
-import { PhotoService, photoService } from "./photo.service.js";
-import { PriceService, priceService } from "./price.service.js";
 import { QueryCharacteristicsDto } from "../dto/characteristic/query-characteristics.dto.js";
+import { Photo } from "../entity/photo.entity.js";
+import { Label } from "../entity/label.entity.js";
+import { Category } from "../entity/category.entity.js";
+import { Brand } from "../entity/brand.entity.js";
+import { Characteristic } from "../entity/characteristics.entity.js";
+import { Price } from "../entity/price.entity.js";
 
+
+interface CreateProductData {
+    model : string 
+    discription ?: string
+    name : string 
+    priceHistory : Price[]
+    status : string 
+    title : string
+    images ?: Photo[]
+    label : Label | null
+    category : Category
+    brand : Brand
+    characteristics ?: Characteristic[]
+}
 
 const repo = myDataSource.getRepository(Product)
 
 export class ProductService {
 
-    constructor (
-        private brandService: BrandService,
-        private categoryService: CategoryService,
-        private characteristicService: CharacteristicService,
-        private labelService: LabelService,
-        private photoService: PhotoService,
-        private priceService: PriceService
-
-     ) {
-
-    }
-
-    async create (createProductDto: CreateProductDto) {
+    async create (createProductData: CreateProductData) {
         
-        const {brandId, categoryId, characteristics, discription, images, labelId, model, name, price, status, title} = createProductDto
         const product = new Product()
-        product.title = title
-        product.status = status
-        product.name = name
-        product.model = model
-        product.discription = discription
-        
-        const brand = await this.brandService.getOne(brandId)
-        const category = await this.categoryService.getOne(categoryId)
-        const label = await this.labelService.getOne(labelId)
-        const newPrice = await this.priceService.create({value: price})
-        const photos = await this.photoService.getManyByIds(images)
-        const characteristicsArr = await Promise.all(characteristics.map(characteristic => this.characteristicService.create(characteristic)))
-
-        product.priceHistory = [newPrice]
-        product.characteristics = characteristicsArr
-        product.images = photos
-        if(brand) product.brand = brand
-        if(category) product.category = category
-        if(label) product.label = label
-
+        Object.assign(product, createProductData)
         return repo.save(product)
     }
 
@@ -62,6 +43,7 @@ export class ProductService {
     update () {
 
     }
+
     
     getOne (id: number) {
         return repo.findOneBy({id})
@@ -106,12 +88,14 @@ console.log(query);
         let skip = 0
         if(page && limit) skip = page*limit 
 
-        return repo.find({
+
+        return repo.findAndCount({
             where: {
                 title: filter && filter.like && ILike(`%${filter.like}%`),
                 id: ids && In(ids),
                 category: {
-                    systemName: filter && filter.category && filter.category.systemName
+                    systemName: filter && filter.category && filter.category.systemName,
+                    id: filter && filter.category && filter.category.id
                 },
                 brand: {
                     id: filter && filter.brand && filter.brand.id && In(filter.brand.id)
@@ -126,6 +110,4 @@ console.log(query);
     }
 }
 
-export const productService = new ProductService(
-    brandService, categoryService, characteristicService, labelService, photoService, priceService
-)
+export const productService = new ProductService()

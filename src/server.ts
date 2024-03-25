@@ -3,7 +3,7 @@ import cors from 'cors'
 import {config} from 'dotenv'
 import { Routes } from "./routes/index.js"
 import { myDataSource } from "./data-source/data-source.init.js"
-
+import { passportService } from "./middlewares/passport.js"
 
 config()
 const PORT = process.env.APP_PORT || 5000
@@ -17,6 +17,7 @@ app.use(express.static('uploads'))
 app.use(express.json())
 app.use(cors())
 router.init()
+passportService.init()
 
 
 myDataSource

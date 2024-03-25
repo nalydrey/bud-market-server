@@ -1,22 +1,26 @@
-import { ArrayContains, In, IsNull, Not } from "typeorm";
+import { In, IsNull, Not } from "typeorm";
 import { myDataSource } from "../data-source/data-source.init.js";
-import { CreateCategoryDto } from "../dto/create-category.dto.js";
+import { CreateCategoryDto } from "../dto/category/create-category.dto.js";
 import { EditCategoryDto } from "../dto/edit-category.dto.js";
 import { Category } from "../entity/category.entity.js";
 import getSlug from 'speakingurl'
-import { PhotoService } from "./photo.service.js";
 import { Photo } from "../entity/photo.entity.js";
 import { CategoryQueryDto } from "../dto/category/category-query.dto.js";
 
+interface CreateCategoryData extends CreateCategoryDto {
+    photo?: Photo | null
+}
+
 const repo = myDataSource.getRepository(Category)
-const treeRepo = await myDataSource.manager.getTreeRepository(Category)
+const treeRepo = myDataSource.manager.getTreeRepository(Category)
 
 export class CategoryService {
 
-    async create(categoryDto: CreateCategoryDto, photo: Photo ) {
-        const {name, parentId} = categoryDto
+    async create(createData: CreateCategoryData) {
+        const {name, parentId, photo} = createData
         const category = new Category()
-        category.photo = photo
+        category.name
+        if(photo) category.photo = photo
         if(parentId){
             const parent = await repo.findOneBy({id: parentId})
             if(parent) category.parent = parent
@@ -27,15 +31,13 @@ export class CategoryService {
         return repo.save(category)
     }
 
-    delete(id: number) {
-        return repo.delete(id)
+    delete(category: Category) {
+        return repo.remove(category)
     }
 
     async update(editCategoryDto: EditCategoryDto) {
         const { id, name, parentId } = editCategoryDto
         const category = await repo.findOneBy({id})
-        console.log(category);
-        
         if(category){
             if(name) category.name = name
             if(parentId){
@@ -65,8 +67,6 @@ export class CategoryService {
     }
 
     getMany(query: CategoryQueryDto) {
-        console.log('GET MANY CATEGORIES');
-        
         console.log(query);
         
        return repo.find({

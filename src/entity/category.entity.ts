@@ -9,10 +9,14 @@ export class Category {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({
+        unique: true
+    })
     systemName: string
 
-    @Column()
+    @Column({
+        unique: true
+    })
     name: string
 
     @TreeChildren()

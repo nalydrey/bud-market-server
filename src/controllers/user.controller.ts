@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
-import { CreateUserDto } from "../dto/user/create-user.dto.js";
+import { RegisterUserDto } from "../dto/user/register-user.dto.js";
 import { UserService, userService } from "../services/user.service.js";
 import { ProductService, productService } from "../services/product.service.js";
 import { ChangeFavoriteDto } from "../dto/user/change-favorite.dto.js";
 import { User } from "../entity/user.entity.js";
 import { ChangeCompareDto } from "../dto/user/change-compare.dto.js";
+import { LoginDto } from "../dto/user/login0user.dto.js";
+import { ExtRequest } from "../models/ext-request.model.js";
 
 
 export class UserController {
@@ -12,32 +14,63 @@ export class UserController {
     constructor(private userService: UserService, private productService: ProductService){}
 
     async register(req: Request, res: Response){
-        const createUserDto: CreateUserDto = req.body
-        await this.userService.create(createUserDto)
+        const createUserDto: RegisterUserDto = req.body
+        await this.userService.registration(createUserDto)
         res.status(201).json({
             message: 'new user is registered'
         })
     }
 
-    async login(req: Request, res: Response){
-        const email: string | undefined = req.query.email as string | undefined
-        const password: string | undefined = req.query.password as string | undefined
-        let user: User | null = null
-        if(email && password){
-            user = await this.userService.login({email, password})
+    async login(req: ExtRequest, res: Response){
+        try{
+            const { password } = req.body as LoginDto
+            const user = req.entity
+            let token: string | null = null
+            if(user instanceof User){
+                token = await this.userService.login({user, password})
+            }
+            if(!token) throw new Error('Email or Password are wrong')
+            res.status(200).json({
+                token
+            })
         }
-        res.status(200).json({
-            user
-        })
+        catch{
+            res.status(500).json({
+                message: 'Помилка при логінізації'
+            })
+        }
+    }
+
+    enter(req: ExtRequest, res: Response) {
+        try{
+            const user = req.user
+
+            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            console.log(user);
+            
+            
+
+            if(!user) throw new Error('No user')
+            res.status(200).json({
+                user: req.user
+            })
+        }
+        catch{
+            res.status(500).json({
+                message: 'Помилка при вході'
+            })
+        }
+        
         
     }
 
     async changeFavourite(req: Request, res: Response){
         const changeFavoriteDto: ChangeFavoriteDto = req.body
-        const {productId, userId} = changeFavoriteDto
+        const {productId} = changeFavoriteDto
+        const user = req.user as User
         const product = await this.productService.getOne(productId)
         if(product){
-            await this.userService.changeFavourites(userId, product)
+            await this.userService.changeFavourites(user, product)
             res.status(200).json({
                 message: 'favorite products were changed'
             })
@@ -46,10 +79,11 @@ export class UserController {
 
     async changeCompare (req: Request, res: Response) {
         const changeCompareDto: ChangeCompareDto = req.body
-        const {productId, userId} = changeCompareDto
+        const {productId} = changeCompareDto
+        const user = req.user as User
         const product = await this.productService.getOne(productId)
         if(product){
-            await this.userService.changeCompare(userId, product)
+            await this.userService.changeCompare(user, product)
             res.status(200).json({
                 message: 'compared products were changed'
             })

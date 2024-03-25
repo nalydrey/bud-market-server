@@ -20,8 +20,8 @@ export class BrandService {
         return repo.save(newBrand)
     }
 
-    delete(id: number){
-        return repo.delete(id)
+    delete(brand: Brand){
+        return repo.remove(brand)
     }
 
     async edit(editBrandDto: EditBrandDto){

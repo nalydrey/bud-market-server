@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { BrandService, brandService } from "../services/brand.service.js";
 import { FileService, fileService } from "../services/file.service.js";
+import { ExtRequest } from "../models/ext-request.model.js";
+import { Brand } from "../entity/brand.entity.js";
 
 export class BrandController {
 
@@ -25,16 +27,19 @@ export class BrandController {
         }
     }
 
-    async delete(req: Request, res: Response){
+    async delete(req: ExtRequest, res: Response){
         try{
-            const id = +req.params.id
-            const brand = await this.brandService.getOne(id)
+            const brand = req.entity
             if(!brand) throw new Error('note was not found')
-            await this.brandService.delete(id)
-            await this.fileService.delete(brand.logoImg)
-            res.status(200).json({
-                success: true
-            })
+            if(brand instanceof Brand){
+                const fileName = brand.logoImg?.split('/').pop()
+                fileName &&
+                await this.fileService.delete(fileName)
+                await this.brandService.delete(brand)
+                res.status(200).json({
+                    brand
+                })
+            } 
         }
         catch(err){
             res.status(500).json({
@@ -65,17 +70,19 @@ export class BrandController {
         }
     }
 
-    async getOne(req: Request, res: Response){
-        const id = +req.params.id
+    async getOne(req: ExtRequest, res: Response){
+        const brand = req.entity
         try{
-            const brand = await this.brandService.getOne(id)
-            res.status(200).json({
-                brand
-            })
+            if(!brand) throw new Error('No brand')
+            if(brand instanceof Brand){
+                res.status(200).json({
+                    brand
+                })
+            }
         }
         catch(err){
             res.status(500).json({
-                message: 'Error when find brand'
+                message: 'Бренд не завантажений'
             })
         }
     }

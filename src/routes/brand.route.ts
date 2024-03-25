@@ -7,6 +7,7 @@ import { CreateBrandDto } from '../dto/brand/create-brand.dto.js';
 import { validateAndTransform } from '../middlewares/validator.js';
 import { alreadyExist } from '../middlewares/alreadyExist.js';
 import { Brand } from '../entity/brand.entity.js';
+import { ParamsDto } from '../dto/params/brand-params.dto.js';
 
 
 
@@ -28,8 +29,17 @@ brandRouter.post('/', upload.single('file'), validateAndTransform(CreateBrandDto
 
 brandRouter.put('/:id', upload.single('file'), brandController.edit.bind(brandController))
 
-brandRouter.delete('/:id', brandController.delete.bind(brandController))
+brandRouter.delete(
+  '/:id', 
+  validateAndTransform(ParamsDto, 'params'),
+  alreadyExist(Brand, 'id', {dir: true, from: 'params'}), 
+  brandController.delete.bind(brandController)
+)
 
-brandRouter.get('/:id', brandController.getOne.bind(brandController))
+brandRouter.get('/:id',
+validateAndTransform(ParamsDto, 'params'),
+alreadyExist(Brand, 'id', {dir: true, from: 'params'}), 
+brandController.getOne.bind(brandController)
+)
 
 brandRouter.get('/', brandController.getMany.bind(brandController))

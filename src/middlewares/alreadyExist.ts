@@ -1,6 +1,7 @@
 import { EntityTarget, FindOptionsWhere, ObjectLiteral } from "typeorm";
 import { myDataSource } from "../data-source/data-source.init.js";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
+import { ExtRequest } from "../models/ext-request.model.js";
 
 type SourceType = 'body' | 'query' | 'params'
 
@@ -22,11 +23,13 @@ interface AlreadyExistOptions {
     }
 
     const repo = myDataSource.getRepository(entity)
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req: ExtRequest, res: Response, next: NextFunction) => {
         try{
             const where = {[field]: req[source][distField]} as FindOptionsWhere<T>
             const instance = await repo.findOneBy(where)
+            
             if(direction ? !instance : instance) throw new Error()
+            if(instance) req.entity = instance
             next()
         }
         catch(err){

@@ -7,13 +7,17 @@ import { Label } from "./label.entity.js"
 import { Category } from "./category.entity.js"
 import { User } from "./user.entity.js"
 import { Review } from "./review.entity.js"
+import { OrderItem } from "./order-item.entity.js"
+import { Order } from "./order.entity.js"
 
 @Entity()
 export class Product {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({
+        unique: true
+    })
     title: string
 
     @Column()
@@ -43,6 +47,9 @@ export class Product {
 
     @ManyToOne(() => Category, (category) => category.products, {eager: true}) 
     category: Relation<Category>
+    
+    @OneToMany(() => OrderItem, (orderItem) => orderItem.product) 
+    orderItems: Relation<OrderItem[]>
 
     @ManyToMany(() => User, (user) => user.favorite)
     favoriteForUsers: Relation<User[]> 

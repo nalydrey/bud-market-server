@@ -8,6 +8,7 @@ import { characteristicRouter } from "./characteristic.route.js"
 import { orderRouter } from "./order.route.js"
 import { userRouter } from "./user.route.js"
 import { reviewRouter } from "./review.route.js"
+import { basketRouter } from "./basket.route.js"
 
 
 export class Routes {
@@ -26,5 +27,6 @@ export class Routes {
       this.app.use(`${this.baseURL}/order`, orderRouter)
       this.app.use(`${this.baseURL}/users`, userRouter)
       this.app.use(`${this.baseURL}/reviews`, reviewRouter)
+      this.app.use(`${this.baseURL}/basket`, basketRouter)
    }
 }

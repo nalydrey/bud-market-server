@@ -1,6 +1,6 @@
 import { myDataSource } from "../data-source/data-source.init.js";
-import { CreateLabelDto } from "../dto/create-label.dto.js";
-import { EditLabelDto } from "../dto/edit-label.dto.js";
+import { CreateLabelDto } from "../dto/label/create-label.dto.js";
+import { EditLabelDto } from "../dto/label/edit-label.dto.js";
 import { Label } from "../entity/label.entity.js";
 
 const repo = myDataSource.getRepository(Label)
@@ -13,8 +13,8 @@ export class LabelService {
         return repo.save(label)
     }
 
-    delete(id: number) {
-        return repo.delete(id)
+    delete(label: Label) {
+        return repo.remove(label)
     }
 
     async update(editDto: EditLabelDto) {

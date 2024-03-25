@@ -1,4 +1,4 @@
-import {IsNumber, IsString, Length} from 'class-validator'
+import {IsNotEmpty, IsString, Length} from 'class-validator'
 
 export class CreateBrandDto {
 
@@ -8,5 +8,6 @@ export class CreateBrandDto {
     @Length(2, 20, {message({constraints}) {
         return `Назва бренду повинна бути більше ${constraints[0]} та менше ${constraints[1]}`
     },})
+    @IsNotEmpty({message: "Назва бренду обов'язкова"})
     name: string
 }
